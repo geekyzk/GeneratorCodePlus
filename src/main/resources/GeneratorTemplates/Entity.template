@@ -1,0 +1,64 @@
+package ${model.packageName};
+
+import lombok.Data;
+
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
+<% for(item in model.items) {%>
+<%if(item.type == "BigDecimal") {%>
+import java.math.BigDecimal;
+<%}if(item.type == "Instant") {%>
+import java.time.Instant;
+<%}if(item.type == "Date") {%>
+import java.util.Date;
+<%}}%>
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.UUID;
+
+/**
+ * @author geekyzk
+ * @Date ${date()}
+ */
+@Data
+@Table(name = "${model.tableName}")
+@Entity
+public class {model.entityName} {
+
+    @Id
+    private String id = UUID.randomUUID().toString().replace("-", "");
+
+    <% for(item in model.items) {%>
+    /**
+    *  ${item.remark}
+    */
+    @Column(unique = ${item.isUnique}, nullable = ${item.isRequire})
+    <% if(item.type == "String"){ %>
+    private String ${item.name};
+
+    <%}else if(item.type == "Integer") {%>
+    private Integer ${item.name};
+
+    <%}else if(item.type == "Boolean") {%>
+    private Boolean ${item.name};
+
+    <%}else if(item.type == "BigDecimal") {%>
+    private BigDecimal ${item.name};
+
+    <%}else if(item.type == "Instant") {%>
+    private Instant ${item.name};
+
+    <%}else if(item.type == "ZonedDateTime") {%>
+    private ZonedDateTime ${item.name};
+
+    <%}else if(item.type == "Date") {%>
+    private Date ${item.name};
+
+    <%}else{%>
+    private String ${item.name};
+    <%}}%>
+    private ZonedDateTime createAt = ZonedDateTime.now(ZoneId.of("UTC-8"));
+
+    private ZonedDateTime updateAt = ZonedDateTime.now(ZoneId.of("UTC-8"));
+}

@@ -1,0 +1,27 @@
+package com.paratera.core.userbonus.service.dto.query;
+
+import com.paratera.query.StringFilter;
+import com.paratera.query.ZonedDateTimeFilter;
+import lombok.Data;
+
+import java.io.Serializable;
+
+@Data
+public class Criteria implements Serializable{
+
+    private static final long serialVersionUID = 1L;
+
+    private StringFilter id;
+
+    private StringFilter name;
+
+    private ZonedDateTimeFilter startTime;
+
+    private ZonedDateTimeFilter endTime;
+
+    private StringFilter remark;
+
+    private ZonedDateTimeFilter updateAt;
+
+    private ZonedDateTimeFilter createAt;
+}

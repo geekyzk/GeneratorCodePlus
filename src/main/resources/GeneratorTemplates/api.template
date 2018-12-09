@@ -1,0 +1,36 @@
+import request from '@/utils/request'
+
+export function list${model.entityName}(params) {
+  return request({
+    url: '/api/${StringUtil.lowerFirst(model.entityName)}',
+    method: 'get',
+    params: params,
+    baseURL: process.env.API
+  })
+}
+
+export function create${model.entityName}(data) {
+  return request({
+    url: '/api/${StringUtil.lowerFirst(model.entityName)}',
+    method: 'post',
+    data: data,
+    baseURL: process.env.API
+  })
+}
+
+export function update${model.entityName}(id, data) {
+  return request({
+    url: '/api/${StringUtil.lowerFirst(model.entityName)}/' + id,
+    method: 'put',
+    data: data,
+    baseURL: process.env.API
+  })
+}
+
+export function delete${model.entityName}(id) {
+  return request({
+    url: '/api/${StringUtil.lowerFirst(model.entityName)}/' + id,
+    method: 'delete',
+    baseURL: process.env.API
+  })
+}

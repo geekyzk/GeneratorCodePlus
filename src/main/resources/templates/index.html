@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>代码生成工具</title>
+    <script src="${ctxPath}/vue.js"></script>
+    <!-- import stylesheet -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- import iView -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="https://cdn.bootcss.com/axios/0.19.0-beta.1/axios.min.js"></script>
+</head>
+<body>
+<el-container id="app">
+    <el-header style="text-align: right; font-size: 12px">
+        <el-menu default-active="1" class="el-menu-demo" mode="horizontal">
+            <el-menu-item index="1">EntityGenerator</el-menu-item>
+            <el-menu-item index="2" disabled>ProjectGenerator</el-menu-item>
+        </el-menu>
+    </el-header>
+    <el-main>
+        <el-form ref="form" label-width="120px">
+            <el-form-item label="项目路径">
+                <el-input v-model="osPath"/>
+            </el-form-item>
+            <el-row>
+                <el-col :span="15">
+                    <el-form-item label="包名称">
+                        <el-input v-model="packageName"/>
+                    </el-form-item>
+                </el-col>
+                <el-col :offset="2" :span="4">
+                    <el-checkbox v-model="createVuePage" label="包含静态" border/>
+                </el-col>
+            </el-row>
+            <el-form-item v-show="createVuePage" label="vue页面路径">
+                <el-input v-model="vuePath" placeholder="vue页面路径，src目录"/>
+            </el-form-item>
+            <el-row>
+                <el-col :span="8">
+                    <el-form-item label="实体类名称">
+                        <el-input v-model="entityName"/>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                    <el-form-item label="实体类中文">
+                        <el-input v-model="remark"/>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                    <el-form-item label="表名称">
+                        <el-input v-model="tableName"/>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-form-item label="字段设置">
+                <el-row v-for="(item, index) in items" :gutter="5" :key="index" style="margin-top: 15px">
+                    <el-col :span="2">
+                        <el-input v-model="item.name" placeholder="字段名称"/>
+                    </el-col>
+                    <el-col :span="2">
+                        <el-input v-model="item.remark" placeholder="中文描述"/>
+                    </el-col>
+                    <el-col :span="2">
+                        <el-input v-model="item.defaultValue" placeholder="默认值"/>
+                    </el-col>
+                    <el-col :span="2">
+                        <el-select v-model="item.type" placeholder="字段类型">
+                            <el-option v-for="(typeItem, typeIndex) in typeList" :label="typeItem.name" :value="typeItem.value" :key="typeIndex"/>
+                        </el-select>
+                    </el-col>
+                    <el-col :span="11">
+                        <el-checkbox v-model="item.isSearch" label="搜索" border></el-checkbox>
+                        <el-checkbox v-model="item.isRequire" label="必须" border></el-checkbox>
+                        <el-checkbox v-model="item.isUnique" label="唯一" border></el-checkbox>
+                    </el-col>
+                    <el-col :span="4">
+                        <el-button type="primary" icon="el-icon-plus" @click="addModelItem">增加</el-button>
+                        <el-button v-if="index !== 0" type="primary" icon="el-icon-delete" @click="delModelItem(index)">删除</el-button>
+                    </el-col>
+                </el-row>
+            </el-form-item>
+            <el-form-item>
+                <el-row :gutter="5">
+                    <el-col :offset="8" :span="8">
+                        <el-button type="primary" round @click="createHandler">代码生成</el-button>
+                    </el-col>
+                </el-row>
+            </el-form-item>
+        </el-form>
+    </el-main>
+</el-container>
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                createVuePage: true,
+                typeList: [{
+                    'name': 'String',
+                    'value': 'String'
+                }, {
+                    'name': 'Integer',
+                    'value': 'Integer'
+
+                }, {
+                    'name': 'ZonedDateTime',
+                    'value': 'ZonedDateTime'
+                }, {
+                    'name': 'Instant',
+                    'value': 'Instant'
+                }, {
+                    'name': 'Boolean',
+                    'value': 'Boolean'
+                }],
+                osPath: '/Users/geekyzk/workspace/private_space/ZbManager/src/main/java',
+                vuePath: '/Users/geekyzk/workspace/private_space/ZbUI/src',
+                packageName: 'com.em248',
+                entityName: '',
+                tableName: '',
+                remark: '',
+                items: [{
+                    name: '',
+                    defaultValue: '',
+                    type: 'String',
+                    isSearch: false,
+                    isRequire: true,
+                    isUnique: false,
+                    remark: ''
+                }]
+            }
+        },
+        methods: {
+            addModelItem() {
+                this.items.push({
+                    name: '',
+                    defaultValue: '',
+                    type: 'String',
+                    isSearch: false,
+                    isUpdate: true,
+                    isNotEmpty: true,
+                    isRequire: true,
+                    isUnique: false,
+                    remark: ''
+                })
+            },
+            delModelItem(index) {
+                var resultItems = []
+                for (var i = 0; i < this.items.length; i++) {
+                    if (i !== index) {
+                        resultItems.push(this.items[i])
+                    }
+                }
+                this.items = resultItems
+            },
+            createHandler() {
+                const createRequestBody = {
+                    osPath: this.osPath,
+                    packageName: this.packageName,
+                    entityName: this.entityName,
+                    tableName: this.tableName,
+                    items: this.items,
+                    remark: this.remark
+                }
+                if (this.createVuePage) {
+                    createRequestBody.vuePath = this.vuePath
+                }
+                console.log(createRequestBody)
+                console.log("${ctxPath}")
+                axios({
+                    method:'post',
+                    url:'${ctxPath}/api/entity',
+                    data: createRequestBody
+                })
+                    .then(function (response) {
+                        console.log("response")
+                    });
+            }
+        }
+    })
+</script>
+</body>
+</html>

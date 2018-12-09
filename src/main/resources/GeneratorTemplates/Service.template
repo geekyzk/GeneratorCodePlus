@@ -1,0 +1,32 @@
+package ${model.packageName}.service;
+
+
+import ${model.packageName}.model.${model.entityName};
+import ${model.packageName}.service.dto.Create${model.entityName}Request;
+import ${model.packageName}.service.dto.Update${model.entityName}Request;
+import ${model.packageName}.service.dto.query.${model.entityName}Criteria;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import java.util.List;
+
+/**
+ * @author geekyzk ${ date() }
+ **/
+
+public interface ${model.entityName}Service {
+
+    ${model.entityName} findById(String id);
+
+    Page<${model.entityName}> list(${model.entityName}Criteria criteria, Pageable page);
+
+    ${model.entityName} update(String id, Update${model.entityName}Request request);
+
+    ${model.entityName} create(Create${model.entityName}Request request);
+
+
+    void delete(String id);
+
+    void deleteAll(List<String> ids);
+
+}

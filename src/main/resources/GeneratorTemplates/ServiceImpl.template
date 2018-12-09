@@ -1,0 +1,120 @@
+package ${model.packageName}.service.impl;
+
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
+import ${model.packageName}.exception.BackException;
+import ${model.packageName}.model.${model.entityName};
+import ${model.packageName}.model.${model.entityName}_;
+import ${model.packageName}.repository.${model.entityName}Repository;
+import ${model.packageName}.service.${model.entityName}Service;
+import ${model.packageName}.service.dto.Create${model.entityName}Request;
+import ${model.packageName}.service.dto.Update${model.entityName}Request;
+import ${model.packageName}.service.dto.query.${model.entityName}Criteria;
+import ${model.packageName}.QueryService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * Created by geekyzk on 13/03/2018.
+ */
+@Service
+@Slf4j
+public class ${model.entityName}ServiceImpl extends QueryService<${model.entityName}> implements ${model.entityName}Service {
+
+    private ${model.entityName}Repository ${StringUtil.lowerFirst(model.entityName)}Repository;
+
+    @Autowired
+    public ServiceImpl(${model.entityName}Repository ${model.entityName}Repository) {
+        this.${StringUtil.lowerFirst(model.entityName)}Repository = ${model.entityName}Repository;
+    }
+
+    @Override
+    public ${model.entityName} findById(String id) {
+        log.debug("findById ${model.entityName} id {}",id);
+        return ${StringUtil.lowerFirst(model.entityName)}Repository.findById(id)
+                .orElseThrow(() -> new BackException("记录不存在，请重新确认"));
+    }
+
+    @Override
+    public ${model.entityName} create(Create${model.entityName}Request request) {
+        log.debug("create ${model.entityName} request {}",request);
+        ${model.entityName} ${StringUtil.lowerFirst(model.entityName)} = new ${model.entityName}();
+        BeanUtil.copyProperties(request, ${StringUtil.lowerFirst(model.entityName)}, CopyOptions.create().setIgnoreNullValue(true));
+
+        log.debug("create ${model.entityName} result {}",entity);
+        return ${StringUtil.lowerFirst(model.entityName)}Repository.save(${StringUtil.lowerFirst(model.entityName)});
+    }
+
+    @Override
+    public ${model.entityName} update(String id, Update${model.entityName}Request request) {
+        log.debug("update ${model.entityName} Request {},{}",id,request);
+        ${model.entityName} ${StringUtil.lowerFirst(model.entityName)} = findById(id);
+        BeanUtil.copyProperties(request, ${StringUtil.lowerFirst(model.entityName)}, CopyOptions.create().setIgnoreNullValue(true));
+        entity.setUpdateAt(ZonedDateTime.now(ZoneId.of("UTC-8")));
+        log.debug("update ${model.entityName} result {},{}",id,entity);
+        return ${StringUtil.lowerFirst(model.entityName)}Repository.save(${StringUtil.lowerFirst(model.entityName)});
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<${model.entityName}> list(${model.entityName}Criteria criteria, Pageable page) {
+        log.debug("list ${model.entityName} Request {},page {}",criteria,page);
+        PageRequest pageRequest = PageRequest.of(page.getPageNumber() - 1, page.getPageSize(), page.getSort());
+        Specification<${model.entityName}> specification = createSpecification(criteria);
+        return ${StringUtil.lowerFirst(model.entityName)}Repository.findAll(specification, pageRequest);
+    }
+
+    private Specification<${model.entityName}> createSpecification(${model.entityName}Criteria criteria) {
+        Specification<${model.entityName}> specification = Specification.where(null);
+        if (criteria != null) {
+            <% for(item in model.items) {%>
+            <% if(item.type == "String"){ %>
+            if (criteria.get${StringUtil.upperFirst(item.name)}() != null) {
+                specification = specification.and(buildStringSpecification(criteria.get${StringUtil.upperFirst(item.name)}(), ${model.entityName}_.${item.name}));
+            }
+            <%}else if(item.type == "Integer" || item.type == "Instant" || item.type == "ZonedDateTime") {%>
+            if (criteria.get${StringUtil.upperFirst(item.name)}() != null) {
+                specification = specification.and(buildRangeSpecification(criteria.get${StringUtil.upperFirst(item.name)}(), ${model.entityName}_.${item.name}));
+            }
+            <%}else if(item.type == "Boolean" || item.type == "BigDecimal") {%>
+            if (criteria.get${StringUtil.upperFirst(item.name)}() != null) {
+                specification = specification.and(buildSpecification(criteria.get${StringUtil.upperFirst(item.name)}(), ${model.entityName}_.${item.name}));
+            }
+            <%}}%>
+
+            if (criteria.getId() != null) {
+                specification = specification.and(buildStringSpecification(criteria.getId(), ${model.entityName}_.id));
+            }
+            if (criteria.getCreateAt() != null) {
+                specification = specification.and(buildRangeSpecification(criteria.getCreateAt(), ${model.entityName}_.createAt));
+            }
+            if (criteria.getUpdateAt() != null) {
+                specification = specification.and(buildRangeSpecification(criteria.getUpdateAt(), ${model.entityName}_.updateAt));
+            }
+        }
+        return specification;
+    }
+
+    @Override
+    public void delete(String id) {
+        log.debug("delete ${model.entityName} Request {}",id);
+        ${StringUtil.lowerFirst(model.entityName)}Repository.deleteById(id);
+    }
+
+    @Override
+    public void deleteAll(List<String> ids) {
+        log.debug("deleteAll ${model.entityName} Request {}",ids);
+        ids.forEach(this::delete);
+    }
+}

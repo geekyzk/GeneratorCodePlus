@@ -1,0 +1,52 @@
+package ${model.packageName}.service.dto;
+
+import lombok.Data;
+
+<% for(item in model.items) {%>
+<%if(item.type == "BigDecimal") {%>
+import java.math.BigDecimal;
+<%}if(item.type == "Instant") {%>
+import java.time.Instant;
+<%}if(item.type == "Date") {%>
+import java.util.Date;
+<%}}%>
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
+/**
+ * @author geekyzk
+ * @Date ${date()}
+ */
+@Data
+public class Create${model.entityName}Request {
+
+
+    <% for(item in model.items) {%>
+    /**
+    *  ${item.remark}
+    */
+    <% if(item.type == "String"){ %>
+    private String ${item.name};
+
+    <%}else if(item.type == "Integer") {%>
+    private Integer ${item.name};
+
+    <%}else if(item.type == "Boolean") {%>
+    private Boolean ${item.name};
+
+    <%}else if(item.type == "BigDecimal") {%>
+    private BigDecimal ${item.name};
+
+    <%}else if(item.type == "Instant") {%>
+    private Instant ${item.name};
+
+    <%}else if(item.type == "ZonedDateTime") {%>
+    private ZonedDateTime ${item.name};
+
+    <%}else if(item.type == "Date") {%>
+    private Date ${item.name};
+
+    <%}else{%>
+    private String ${item.name};
+    <%}}%>
+}
