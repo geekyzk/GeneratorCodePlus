@@ -1,17 +1,24 @@
-package ${model.packageName}.service.dto.query;
+package com.paratera.core.prepayment.service.dto.query;
 
-
+import com.paratera.query.BigDecimalFilter;
+import com.paratera.query.StringFilter;
+import com.paratera.query.ZonedDateTimeFilter;
 import lombok.Data;
 
 import java.io.Serializable;
 
 @Data
-public class ${model.entityName}Criteria implements Serializable{
+public class PrePaymentCriteria implements Serializable{
 
-    private static final long serialVersionUID = 1L;
+    private StringFilter name;
 
-    private StringFilter id;
-    <% for(item in model.items) {%>
+    private StringFilter userId;
+
+    private BigDecimalFilter prePaymentLimit;
+
+    private ZonedDateTimeFilter createAt;
+
+    private ZonedDateTimeFilter updateAt;
     <% if(item.type == "String"){ %>
     private StringFilter ${item.name};
 
@@ -31,10 +38,7 @@ public class ${model.entityName}Criteria implements Serializable{
     private ZonedDateTimeFilter ${item.name};
 
     <%}else{%>
-    private StringFilter ${item.name};
+        private String ${item.name};
     <%}}%>
 
-    private ZonedDateTimeFilter updateAt;
-
-    private ZonedDateTimeFilter createAt;
 }

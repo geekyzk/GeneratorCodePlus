@@ -54,10 +54,21 @@ public class GeneratorFactory {
         return template.render();
     }
 
-    public static
+    public static String generatorCriteria(GeneratorEntity generatorEntity) {
+        Template template = BeetlConfiguration.groupTemplate.getTemplate("/Criteria.template");
+        template.binding("model", generatorEntity);
+        return template.render();
+    }
+
 
     public static String generatorJsApiFile(GeneratorEntity generatorEntity) {
         Template template = BeetlConfiguration.groupTemplate.getTemplate("/api.template");
+        template.binding("model", generatorEntity);
+        return template.render();
+    }
+
+    public static String generatorVueFile(GeneratorEntity generatorEntity) {
+        Template template = BeetlConfiguration.groupTemplate.getTemplate("/view.vue");
         template.binding("model", generatorEntity);
         return template.render();
     }

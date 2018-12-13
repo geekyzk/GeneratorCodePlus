@@ -35,7 +35,7 @@ public class ${model.entityName}ServiceImpl extends QueryService<${model.entityN
     private ${model.entityName}Repository ${StringUtil.lowerFirst(model.entityName)}Repository;
 
     @Autowired
-    public ServiceImpl(${model.entityName}Repository ${model.entityName}Repository) {
+    public ${model.entityName}ServiceImpl(${model.entityName}Repository ${model.entityName}Repository) {
         this.${StringUtil.lowerFirst(model.entityName)}Repository = ${model.entityName}Repository;
     }
 
@@ -52,7 +52,7 @@ public class ${model.entityName}ServiceImpl extends QueryService<${model.entityN
         ${model.entityName} ${StringUtil.lowerFirst(model.entityName)} = new ${model.entityName}();
         BeanUtil.copyProperties(request, ${StringUtil.lowerFirst(model.entityName)}, CopyOptions.create().setIgnoreNullValue(true));
 
-        log.debug("create ${model.entityName} result {}",entity);
+        log.debug("create ${model.entityName} result {}",${StringUtil.lowerFirst(model.entityName)});
         return ${StringUtil.lowerFirst(model.entityName)}Repository.save(${StringUtil.lowerFirst(model.entityName)});
     }
 
@@ -61,8 +61,8 @@ public class ${model.entityName}ServiceImpl extends QueryService<${model.entityN
         log.debug("update ${model.entityName} Request {},{}",id,request);
         ${model.entityName} ${StringUtil.lowerFirst(model.entityName)} = findById(id);
         BeanUtil.copyProperties(request, ${StringUtil.lowerFirst(model.entityName)}, CopyOptions.create().setIgnoreNullValue(true));
-        entity.setUpdateAt(ZonedDateTime.now(ZoneId.of("UTC-8")));
-        log.debug("update ${model.entityName} result {},{}",id,entity);
+        ${StringUtil.lowerFirst(model.entityName)}.setUpdateAt(ZonedDateTime.now(ZoneId.of("UTC-8")));
+        log.debug("update ${model.entityName} result {},{}",id,${StringUtil.lowerFirst(model.entityName)});
         return ${StringUtil.lowerFirst(model.entityName)}Repository.save(${StringUtil.lowerFirst(model.entityName)});
     }
 

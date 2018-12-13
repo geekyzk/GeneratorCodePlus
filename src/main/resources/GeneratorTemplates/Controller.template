@@ -22,30 +22,30 @@ import javax.validation.Valid;
 @RequestMapping("/${StringUtil.lowerFirst(model.entityName)}")
 @RestController
 @Slf4j
-public class ${model.entityName}RestController {
+public class ${model.entityName}Controller {
 
     private ${model.entityName}Service ${StringUtil.lowerFirst(model.entityName)}Service;
 
     @Autowired
-    public Controller(${model.entityName}Service ${StringUtil.lowerFirst(model.entityName)}Service) {
+    public ${model.entityName}RestController(${model.entityName}Service ${StringUtil.lowerFirst(model.entityName)}Service) {
         this.${StringUtil.lowerFirst(model.entityName)}Service = ${StringUtil.lowerFirst(model.entityName)}Service;
     }
 
 
     @GetMapping
     public ResponseEntity<?> list(${model.entityName}Criteria criteria, @PageableDefault(size = 10,page = 1)  Pageable page) {
-        log.debug("Get list entity request {},{}",criteria,page)
+        log.debug("Get list entity request {},{}",criteria,page);
         Page<${model.entityName}> ${StringUtil.lowerFirst(model.entityName)}s = ${StringUtil.lowerFirst(model.entityName)}Service.list(criteria,page);
-        log.debug("Get list entity request {},{} return.",criteria,page)
+        log.debug("Get list entity request {},{} return.",criteria,page);
         return ResponseEntity.ok(ListResultResponse.dataSuccess("查询成功", ${StringUtil.lowerFirst(model.entityName)}s));
     }
 
 
     @PostMapping
-    public ResponseEntity<?> create(@Valid Create${model.entityName}Request request) {
-        log.debug("Post entity request {}",request)
+    public ResponseEntity<?> create(@Valid @RequestBody Create${model.entityName}Request request) {
+        log.debug("Post entity request {}",request);
         ${model.entityName} ${StringUtil.lowerFirst(model.entityName)} = ${StringUtil.lowerFirst(model.entityName)}Service.create(request);
-        log.debug("Post entity request {} return",${StringUtil.lowerFirst(model.entityName)})
+        log.debug("Post entity request {} return",${StringUtil.lowerFirst(model.entityName)});
         return ResponseEntity.ok(ResultResponse.dataSuccess("创建成功",${StringUtil.lowerFirst(model.entityName)}));
     }
 
@@ -53,9 +53,9 @@ public class ${model.entityName}RestController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update (@PathVariable String id, @RequestBody Update${model.entityName}Request request) {
-        log.debug("Put entity request {},{}",id,request)
+        log.debug("Put entity request {},{}",id,request);
         ${model.entityName} ${StringUtil.lowerFirst(model.entityName)} = ${StringUtil.lowerFirst(model.entityName)}Service.update(id, request);
-        log.debug("Put entity request {},{} return",id,${StringUtil.lowerFirst(model.entityName)})
+        log.debug("Put entity request {},{} return",id,${StringUtil.lowerFirst(model.entityName)});
         return ResponseEntity.ok(ResultResponse.dataSuccess("更新成功",${StringUtil.lowerFirst(model.entityName)}));
     }
 
@@ -63,9 +63,9 @@ public class ${model.entityName}RestController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable String id) {
-        log.debug("Delete entity request {}",id)
+        log.debug("Delete entity request {}",id);
         ${StringUtil.lowerFirst(model.entityName)}Service.delete(id);
-        log.debug("Delete entity request {} return",id)
+        log.debug("Delete entity request {} return",id);
         return ResponseEntity.ok(ResultResponse.simpleSuccess("删除成功"));
     }
 

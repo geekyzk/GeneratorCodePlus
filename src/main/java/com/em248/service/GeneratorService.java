@@ -5,6 +5,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.StrUtil;
 import com.em248.controller.BackException;
 import com.em248.generator.GeneratorFactory;
 import com.em248.generator.dto.GeneratorEntity;
@@ -43,7 +44,7 @@ public class GeneratorService {
         }
 
         generatorFile(GeneratorFactory.generatorModel(generatorEntity),
-                request.getEntityName(),
+                request.getEntityName() + ".java",
                 sourcePath + File.separator + "model");
         generatorFile(GeneratorFactory.generatorRepository(generatorEntity),
                 request.getEntityName() + "Repository.java",
@@ -60,9 +61,23 @@ public class GeneratorService {
         generatorFile(GeneratorFactory.generatorCreateRequest(generatorEntity),
                 "Create" + request.getEntityName() + "Request.java",
                 sourcePath + File.separator + "service" + File.separator + "dto");
+        generatorFile(GeneratorFactory.generatorCriteria(generatorEntity),
+                request.getEntityName() + "Criteria.java",
+                sourcePath + File.separator + "service" + File.separator + "dto" + File.separator + "query");
         generatorFile(GeneratorFactory.generatorController(generatorEntity),
                 request.getEntityName() + "Controller.java",
                 sourcePath + File.separator + "controller");
+
+        String vuePath = request.getVuePath();
+        if (StrUtil.isNotBlank(vuePath)) {
+            generatorFile(GeneratorFactory.generatorJsApiFile(generatorEntity),
+                    request.getEntityName() + "Api.js",
+                    vuePath + File.separator + "api");
+            generatorFile(GeneratorFactory.generatorVueFile(generatorEntity),
+                    request.getEntityName() + ".vue",
+                    vuePath + File.separator + "views");
+
+        }
     }
 
 

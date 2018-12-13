@@ -61,10 +61,10 @@
 
     <!-- 对话框 -->
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="38%" top="7vh">
-      <el-form class="form-add" :model="${lowerFirst(model.entityName)}Temp" :rules="rules" ref="BonusLevelForm" label-width="100px" style="width: 100%; padding-left:10px;padding-right:10px">
+      <el-form class="form-add" :model="${StringUtil.lowerFirst(model.entityName)}Temp" :rules="rules" ref="BonusLevelForm" label-width="100px" style="width: 100%; padding-left:10px;padding-right:10px">
         <% for(item in model.items) {%>
         <el-form-item label="${item.remark}" prop="${item.name}">
-          <el-input v-model="${lowerFirst(model.entityName)}Temp.${item.name}" style="width:100%"></el-input>
+          <el-input v-model="${StringUtil.lowerFirst(model.entityName)}Temp.${item.name}" style="width:100%"></el-input>
         </el-form-item>
         <%}%>
       </el-form>
@@ -93,7 +93,7 @@
 </template>
 
 <script>
-import { list${model.entityName}, create${model.entityName}, update${model.entityName}, delet${model.entityName} } from '@/api/${model.entityName}'
+import { list${model.entityName}, create${model.entityName}, update${model.entityName}, delete${model.entityName} } from '@/api/${model.entityName}Api'
 import waves from '@/directive/waves'
 import { formatDate } from '@/utils'
 
@@ -123,7 +123,7 @@ export default {
         'name.contains': undefined
       },
       data: [],
-      ${lowerFirst(model.entityName)}Temp: {
+      ${StringUtil.lowerFirst(model.entityName)}Temp: {
         <% for(item in model.items) {%>
         ${item.name}: undefined,
         <%}%>
@@ -132,7 +132,7 @@ export default {
       rules: {
         <%for(item in model.items) {%>
           <%if(item.isRequire){%>
-        ${item.name}: [{required: true, message: '${item.remark}为必须参数', trigger: 'change'}],
+        ${item.name}: [{ required: true, message: '${item.remark}为必须参数', trigger: 'change' }],
         <%}}%>
       }
     }
@@ -157,9 +157,9 @@ export default {
     },
     sortSignTime(column) {
       if (column.order === 'ascending') {
-        this.listParams['sort'] = `${column.prop},asc`
+        this.listParams['sort'] = `\${column.prop},asc`
       } else if (column.order === 'descending') {
-        this.listParams['sort'] = `${column.prop},desc`
+        this.listParams['sort'] = `\${column.prop},desc`
       } else {
         this.listParams['sort'] = null
       }
@@ -170,14 +170,14 @@ export default {
       this.showData = row
       this.dialogDetailVisible = true
     },
-    reset${lowerFirst(model.entityName)}Temp() {
-      this.${lowerFirst(model.entityName)}Temp = {
+    reset${StringUtil.lowerFirst(model.entityName)}Temp() {
+      this.${StringUtil.lowerFirst(model.entityName)}Temp = {
         name: null,
         remark: null
       }
     },
     handleCreate() {
-      this.reset${lowerFirst(model.entityName)}Temp()
+      this.reset${StringUtil.lowerFirst(model.entityName)}Temp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -188,7 +188,7 @@ export default {
       this.$refs['BonusLevelForm'].validate((valid) => {
         if (valid) {
           this.buttonLoading = true
-          createBonusLevel(this.${lowerFirst(model.entityName)}Temp).then(response => {
+          create${model.entityName}(this.${StringUtil.lowerFirst(model.entityName)}Temp).then(response => {
             this.buttonLoading = false
             if (response.data.code === -1) {
               this.$message({
@@ -212,7 +212,7 @@ export default {
       })
     },
     handleUpdate(row) {
-      this.${lowerFirst(model.entityName)}Temp = {
+      this.${StringUtil.lowerFirst(model.entityName)}Temp = {
         id: row.id,
         name: row.name,
         startBonus: row.startBonus,
@@ -230,7 +230,7 @@ export default {
       this.$refs['BonusLevelForm'].validate((valid) => {
         if (valid) {
           this.buttonLoading = true
-          updateBonusLevel(this.${lowerFirst(model.entityName)}Temp).then(response => {
+          update${model.entityName}(this.${StringUtil.lowerFirst(model.entityName)}Temp).then(response => {
             this.buttonLoading = false
             if (response.data.code === -1) {
               this.$message({
@@ -254,12 +254,12 @@ export default {
       })
     },
     deleteData(id) {
-      this.$confirm('确认删除该积分等级, 是否继续?', '提示', {
+      this.$confirm('确认删除该${model.remark}, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        deleteBonusLevel(id).then(response => {
+        delete${model.entityName}(id).then(response => {
           if (response.data.code === -1) {
             this.$message({
               title: '失败',
@@ -298,17 +298,27 @@ export default {
     handleDownload() {
       this.downloadLoading = true
       import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['名称', '开始区间', '结束区间', '人数百分比', '备注', '创建时间', '更新时间']
-        const filterVal = ['name', 'startBonus', 'endBonus', 'peoplePercent', 'remark', 'createAt', 'updateAt']
+        const tHeader = ['记录编号',
+        <% for(item in model.items) {%>
+                         '${item.remark}',
+        <% } %>
+                         '创建时间',
+                         '更新时间']
+        const filterVal = ['id',
+        <% for(item in model.items) {%>
+                           '${item.name}',
+                <% } %>
+                           'createAt',
+                           'updateAt']
         const params = Object.assign({}, this.listParams)
         params.size = this.total
-        listBonusLevels(params).then(response => {
+        list${model.entityName}(params).then(response => {
           this.exportList = response.data.data
           const data = this.formatJson(filterVal, this.exportList)
           excel.export_json_to_excel({
             header: tHeader,
             data,
-            filename: '积分等级列表'
+            filename: '${model.remark}数据表格'
           })
           this.downloadLoading = false
         })
