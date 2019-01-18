@@ -26,8 +26,10 @@ import javax.persistence.Entity;
 @Data
 @Table(name = "${model.tableName}")
 @Entity
-public class ${model.entityName} extends BasicModel {
+public class ${model.entityName} {
 
+    @Id
+    private String id = UUID.randomUUID().toString().replace("-", "");
 
     <% for(item in model.items) {%>
     /**
@@ -58,4 +60,7 @@ public class ${model.entityName} extends BasicModel {
     <%}else{%>
     private String ${item.name};
     <%}}%>
+    private ZonedDateTime createAt = ZonedDateTime.now(ZoneId.of("UTC+8"));
+
+    private ZonedDateTime updateAt = ZonedDateTime.now(ZoneId.of("UTC+8"));
 }

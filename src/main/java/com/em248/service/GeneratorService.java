@@ -6,6 +6,7 @@ import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.em248.controller.BackException;
 import com.em248.generator.GeneratorFactory;
 import com.em248.generator.dto.GeneratorEntity;
@@ -38,7 +39,7 @@ public class GeneratorService {
             osPath = osPath.substring(0, osPath.length() - 1);
         }
         String packageName = request.getPackageName();
-        String sourcePath = osPath + String.join(File.separator, packageName.split("."));
+        String sourcePath = osPath + File.separator +  String.join(File.separator, packageName.split("\\."));
         if (!FileUtil.exist(sourcePath)) {
             FileUtil.mkdir(sourcePath);
         }
@@ -75,9 +76,12 @@ public class GeneratorService {
                     vuePath + File.separator + "api");
             generatorFile(GeneratorFactory.generatorVueFile(generatorEntity),
                     request.getEntityName() + ".vue",
-                    vuePath + File.separator + "views");
+                    vuePath + File.separator + "views" + File.separator + request.getEntityName().toLowerCase());
 
         }
+
+        String entityJson = JSONUtil.toJsonPrettyStr(request);
+        generatorFile(entityJson,'.' + request.getEntityName() + ".json",sourcePath + File.separator + "model");
     }
 
 

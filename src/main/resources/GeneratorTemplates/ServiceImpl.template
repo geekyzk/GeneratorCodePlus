@@ -10,7 +10,7 @@ import ${model.packageName}.service.${model.entityName}Service;
 import ${model.packageName}.service.dto.Create${model.entityName}Request;
 import ${model.packageName}.service.dto.Update${model.entityName}Request;
 import ${model.packageName}.service.dto.query.${model.entityName}Criteria;
-import ${model.packageName}.QueryService;
+import com.em248.util.QueryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -61,7 +61,7 @@ public class ${model.entityName}ServiceImpl extends QueryService<${model.entityN
         log.debug("update ${model.entityName} Request {},{}",id,request);
         ${model.entityName} ${StringUtil.lowerFirst(model.entityName)} = findById(id);
         BeanUtil.copyProperties(request, ${StringUtil.lowerFirst(model.entityName)}, CopyOptions.create().setIgnoreNullValue(true));
-        ${StringUtil.lowerFirst(model.entityName)}.setUpdateAt(ZonedDateTime.now(ZoneId.of("UTC-8")));
+        ${StringUtil.lowerFirst(model.entityName)}.setUpdateAt(ZonedDateTime.now(ZoneId.of("UTC+8")));
         log.debug("update ${model.entityName} result {},{}",id,${StringUtil.lowerFirst(model.entityName)});
         return ${StringUtil.lowerFirst(model.entityName)}Repository.save(${StringUtil.lowerFirst(model.entityName)});
     }
@@ -93,9 +93,12 @@ public class ${model.entityName}ServiceImpl extends QueryService<${model.entityN
             }
             <%}}%>
 
-            if (criteria.getId() != null) {
-                specification = specification.and(buildStringSpecification(criteria.getId(), ${model.entityName}_.id));
-            }
+           if (criteria.getCreateBy() != null) {
+               specification = specification.and(buildStringSpecification(criteria.getCreateBy(), ${model.entityName}_.createBy));
+           }
+           if (criteria.getUpdateBy() != null) {
+               specification = specification.and(buildStringSpecification(criteria.getUpdateBy(), ${model.entityName}_.updateBy));
+           }
             if (criteria.getCreateAt() != null) {
                 specification = specification.and(buildRangeSpecification(criteria.getCreateAt(), ${model.entityName}_.createAt));
             }

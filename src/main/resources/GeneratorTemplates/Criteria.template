@@ -2,7 +2,9 @@ package ${model.packageName}.service.dto.query;
 
 
 import lombok.Data;
-
+import com.em248.util.IntegerFilter;
+import com.em248.util.StringFilter;
+import com.em248.util.ZonedDateTimeFilter;
 import java.io.Serializable;
 
 @Data
@@ -33,6 +35,10 @@ public class ${model.entityName}Criteria implements Serializable{
     <%}else{%>
     private StringFilter ${item.name};
     <%}}%>
+
+    private StringFilter createBy;
+
+    private StringFilter updateBy;
 
     private ZonedDateTimeFilter updateAt;
 

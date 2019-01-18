@@ -12,9 +12,14 @@
           </el-col>
           <el-col :span="4">
             <el-form-item label="名称" label-width="50px">
-              <el-input @keyup.enter.native="handleFilter" style="width: 100%;" class="filter-item" placeholder="名称" v-model="listParams['name.contains']"></el-input>
+              <el-input style="width: 100%;" class="filter-item" placeholder="名称" v-model="listParams['name.contains']"></el-input>
             </el-form-item>
           </el-col>
+          <% for(item in model.items) {%>
+            <% if(item.isSearch) { %>
+
+            <%}%>
+          <%}%>
           <el-col :span="2">
             <el-button class="filter-item" style="width:100%;padding: 10px 0px;"  type="primary" v-waves icon="el-icon-search" @click="handleFilter">{{$t('table.search')}}</el-button>
           </el-col>
@@ -61,7 +66,7 @@
 
     <!-- 对话框 -->
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="38%" top="7vh">
-      <el-form class="form-add" :model="${StringUtil.lowerFirst(model.entityName)}Temp" :rules="rules" ref="BonusLevelForm" label-width="100px" style="width: 100%; padding-left:10px;padding-right:10px">
+      <el-form class="form-add" :model="${StringUtil.lowerFirst(model.entityName)}Temp" :rules="rules" ref="${StringUtil.lowerFirst(model.entityName)}Form" label-width="100px" style="width: 100%; padding-left:10px;padding-right:10px">
         <% for(item in model.items) {%>
         <el-form-item label="${item.remark}" prop="${item.name}">
           <el-input v-model="${StringUtil.lowerFirst(model.entityName)}Temp.${item.name}" style="width:100%"></el-input>
@@ -74,12 +79,12 @@
         <el-button v-else type="primary" @click="updateData" :loading="buttonLoading">{{$t('table.confirm')}}</el-button>
       </span>
     </el-dialog>
-    <el-dialog title="详情" :visible.sync="dialogDetailVisible" width="40%" top="7vh" style="width: 100%; padding-left:10px;padding-right:10px">
+    <el-dialog :visible.sync="dialogDetailVisible" title="详情" width="40%" top="7vh" style="width: 100%; padding-left:10px;padding-right:10px">
       <el-form ref="form" :model="showData" label-width="90px" label-position="left" style="padding-left: 20px">
         <% for(item in model.items) {%>
         <el-form-item label="${item.remark}">
           <span> {{ showData.${item.name} }}</span>
-        </el-form-item label>
+        </el-form-item >
         <%}%>
         <el-form-item label="创建时间">
           <span>{{ showData.createAt | formatDate }}</span>
@@ -172,8 +177,10 @@ export default {
     },
     reset${StringUtil.lowerFirst(model.entityName)}Temp() {
       this.${StringUtil.lowerFirst(model.entityName)}Temp = {
-        name: null,
-        remark: null
+        <% for(item in model.items) {%>
+        ${item.name}: undefined,
+        <%}%>
+        id: undefined
       }
     },
     handleCreate() {
@@ -181,11 +188,11 @@ export default {
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
-        this.$refs['BonusLevelForm'].clearValidate()
+        this.$refs['${StringUtil.lowerFirst(model.entityName)}Form'].clearValidate()
       })
     },
     createData() {
-      this.$refs['BonusLevelForm'].validate((valid) => {
+      this.$refs['${StringUtil.lowerFirst(model.entityName)}Form'].validate((valid) => {
         if (valid) {
           this.buttonLoading = true
           create${model.entityName}(this.${StringUtil.lowerFirst(model.entityName)}Temp).then(response => {
@@ -212,25 +219,18 @@ export default {
       })
     },
     handleUpdate(row) {
-      this.${StringUtil.lowerFirst(model.entityName)}Temp = {
-        id: row.id,
-        name: row.name,
-        startBonus: row.startBonus,
-        endBonus: row.endBonus,
-        peoplePercent: row.peoplePercent,
-        remark: row.remark
-      }
+      Object.assign(this.${StringUtil.lowerFirst(model.entityName)}Temp, row)
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
-        this.$refs['BonusLevelForm'].clearValidate()
+        this.$refs['${StringUtil.lowerFirst(model.entityName)}Form'].clearValidate()
       })
     },
     updateData() {
-      this.$refs['BonusLevelForm'].validate((valid) => {
+      this.$refs['${StringUtil.lowerFirst(model.entityName)}Form'].validate((valid) => {
         if (valid) {
           this.buttonLoading = true
-          update${model.entityName}(this.${StringUtil.lowerFirst(model.entityName)}Temp).then(response => {
+          update${model.entityName}(this.${StringUtil.lowerFirst(model.entityName)}Temp.id, this.${StringUtil.lowerFirst(model.entityName)}Temp).then(response => {
             this.buttonLoading = false
             if (response.data.code === -1) {
               this.$message({
@@ -300,16 +300,16 @@ export default {
       import('@/vendor/Export2Excel').then(excel => {
         const tHeader = ['记录编号',
         <% for(item in model.items) {%>
-                         '${item.remark}',
-        <% } %>
-                         '创建时间',
-                         '更新时间']
+          '${item.remark}',
+          <% } %>
+          '创建时间',
+          '更新时间']
         const filterVal = ['id',
-        <% for(item in model.items) {%>
-                           '${item.name}',
-                <% } %>
-                           'createAt',
-                           'updateAt']
+          <% for(item in model.items) {%>
+          '${item.name}',
+          <% } %>
+          'createAt',
+          'updateAt']
         const params = Object.assign({}, this.listParams)
         params.size = this.total
         list${model.entityName}(params).then(response => {

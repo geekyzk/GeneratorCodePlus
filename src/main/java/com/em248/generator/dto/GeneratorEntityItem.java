@@ -24,5 +24,7 @@ public class GeneratorEntityItem {
 
     private Boolean isUnique = false;
 
+    private Boolean isSearch = false;
+
 
 }
