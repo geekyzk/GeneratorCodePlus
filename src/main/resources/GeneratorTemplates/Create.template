@@ -10,6 +10,8 @@ import java.time.Instant;
 <%}if(item.type == "Date") {%>
 import java.util.Date;
 <%}}%>
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
@@ -18,6 +20,7 @@ import java.time.ZonedDateTime;
  * @Date ${date()}
  */
 @Data
+@ApiModel(value="Create${model.entityName}Request", name="创建${model.remark}请求对象")
 public class Create${model.entityName}Request {
 
 
@@ -25,6 +28,7 @@ public class Create${model.entityName}Request {
     /**
     *  ${item.remark}
     */
+    @ApiModelProperty(value="${item.remark}")
     <% if(item.type == "String"){ %>
     private String ${item.name};
 

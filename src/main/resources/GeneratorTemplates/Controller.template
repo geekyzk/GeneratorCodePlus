@@ -23,6 +23,7 @@ import javax.validation.Valid;
  */
 @RequestMapping("/api/${StringUtil.lowerFirst(model.entityName)}")
 @RestController
+@Api(tags = "${model.remark}}")
 @Slf4j
 public class ${model.entityName}Controller {
 
